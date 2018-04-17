@@ -11,7 +11,7 @@ library(shiny)
 library(leaflet)
 
 # read in data
-weather <- read.csv('weather2.csv')
+weather <- read.csv('test_weather.csv')
 
 # Content of Page
 ui <- fluidPage(
