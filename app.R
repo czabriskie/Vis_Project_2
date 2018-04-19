@@ -28,24 +28,11 @@ server <- function(input, output) {
   output$distances <- renderLeaflet({
     leaflet(weather) %>%
       addProviderTiles(providers$CartoDB.DarkMatter) %>%
-      # Heat map
-      # addHeatmap(data = all.orders,
-      #            lng = ~longitude, 
-      #            lat = ~latitude, 
-      #            intensity = ~quantity,
-      #            blur = 20, 
-      #            max = 500, 
-      #            radius = 10,
-      #            group = 'heatmap') %>%
-      # addLayersControl(
-      #   overlayGroups = c('heatmap'),
-      #   options = layersControlOptions(collapsed = FALSE)
-      # )        %>%
+      
       
       addCircles(lng = ~longitude, 
                  lat = ~latitude, 
                  fillColor = 'red', 
-                 radius = 25000, 
                  stroke = FALSE, 
                  fillOpacity = 0.8, 
                  opacity = 0.01
