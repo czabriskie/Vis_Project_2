@@ -92,14 +92,19 @@ server <- function(input, output) {
     if (is.null(place)) {
       place <- 'Salt Lake City, Utah'
     }
-    wd <- weather %>% filter(city == gsub(',', '', regmatches(place, regexpr('.+,', place))),
-                             state == gsub(', ', '', regmatches(place, regexpr(',.+', place)))) 
+    city.data <- weather %>% filter(city == gsub(',', '', regmatches(place, regexpr('.+,', place))),
+                                    state == gsub(', ', '', regmatches(place, regexpr(',.+', place)))) 
+    state.data <- weather %>% filter( state == gsub(', ', '', regmatches(place, regexpr(',.+', place))))  %>% 
+      select(-state) %>% group_by(Date) %>% summarise_all(mean, na.rm = TRUE) %>% select(-c(city, Events, AirPtCd))
     
     if(input$feature == 'temp'){
-      ggplot(data = wd, aes(x = Date, y = Mean_TemperatureF)) +
+      ggplot(data = city.data, aes(x = Date, y = Mean_TemperatureF)) +
         geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF),
-                    fill = brewer.pal(5, "Set2")[1]) +
+                    fill = brewer.pal(5, "Set2")[1], alpha = 0.7) +
         geom_line() +
+        geom_line(data = state.data, col = 'red') +
+        geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF), data = state.data, alpha = 0.7,
+                    fill = brewer.pal(5, "Set2")[2]) +
         scale_x_date(limits = as.Date(c(input$dateslider))) +
         labs(title = "Max, Mean, and Min Temperatures",
              x = "",
