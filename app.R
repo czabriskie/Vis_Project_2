@@ -3,7 +3,9 @@
 
 library(shiny)
 library(leaflet)
+library(dplyr)
 library(ggplot2)
+library(ggmap)
 library(RColorBrewer)
 
 theme_update(plot.title = element_text(hjust = 0.5))
@@ -16,12 +18,13 @@ weather$Date <- as.character(weather$Date)
 weather$Date <- as.Date(weather$Date)
 
 cities.states <- weather %>% select(city, state, longitude, latitude) %>% distinct
-cities.states <- droplevels(cities.states)
 
 # Content of Page
 ui <- fluidPage(
   titlePanel('2018 Data Expo'),
-  leafletOutput('map'),
+  br(),
+  leafletOutput('map', height='600px'),
+  absolutePanel(top = 75, left = 70, textInput('target_zone', '' , 'Ex: Salt Lake City')),
   sliderInput("dateslider",
               label = h3("Date Range"),
               min = as.Date("2014-07-01"),
@@ -34,19 +37,32 @@ ui <- fluidPage(
 # Server Information
 server <- function(input, output) {
   # create a reactive value that will store the click position
-  data_of_click <- reactiveValues(clickedMarker=NULL)
+  data_of_click <- reactiveValues(clickedMarker = NULL)
   
-  # Leaflet map with cities as markers
+  # Leaflet map 
   output$map <- renderLeaflet({
+    
+    # Get latitude and longitude
+    if(input$target_zone == 'Ex: Salt Lake City'){
+      ZOOM <- 3
+      LAT <- 38.075171
+      LONG <- -110.560604
+    }else{
+      target_pos <- geocode(input$target_zone)
+      LAT <- target_pos$lat
+      LONG <- target_pos$lon
+      ZOOM <- 6
+    }
+    
     leaflet() %>% 
-      # addProviderTiles(providers$CartoDB.DarkMatter) %>%
+      setView(lng = LONG, lat = LAT, zoom = ZOOM ) %>%
       addTiles(options = providerTileOptions(noWrap = TRUE)) %>%
-      addCircleMarkers(data=cities.states, 
+      addCircleMarkers(data = cities.states, 
                        ~longitude , ~latitude, 
-                       layerId=~as.character(paste(city, state, sep = ', ')), 
+                       layerId = ~as.character(paste(city, state, sep = ', ')), 
                        label = ~as.character(paste(city, state, sep = ', ')), 
-                       radius=8 , color="black",  
-                       fillColor="red", 
+                       radius = 8 , color="black",  
+                       fillColor = "red", 
                        stroke = TRUE, 
                        fillOpacity = 0.8)
   })
@@ -78,4 +94,5 @@ server <- function(input, output) {
 
     })
 }
+
 shinyApp(ui = ui, server = server)
