@@ -31,6 +31,11 @@ ui <- fluidPage(
               min = as.Date("2014-07-01"),
               max = as.Date("2017-09-01"),
               value = as.Date(c("2015-01-01", "2015-06-01"))),
+  radioButtons("feature", "Data to Display",
+               c("Temperature" = "temp",
+                 "Humidity" = "humid",
+                 "Wind Speed" = "wind.speed",
+                 "Precipitation" = "precip")),
   plotOutput('plot'),
   HTML('<p>Eric McKiney and Cameron Zabriskie</p>')
   )
@@ -80,19 +85,28 @@ server <- function(input, output) {
       place <- 'Salt Lake City, Utah'
     }
     wd <- weather %>% filter(city == gsub(',', '', regmatches(place, regexpr('.+,', place))),
-                             state == gsub(', ', '', regmatches(place, regexpr(',.+', place)))) %>% 
-      select(Mean_TemperatureF, Date, Min_TemperatureF, Max_TemperatureF)
+                             state == gsub(', ', '', regmatches(place, regexpr(',.+', place)))) 
     
-    
-    ggplot(data = wd, aes(x = Date, y = Mean_TemperatureF)) +
-      geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF),
-                  fill = brewer.pal(5, "Set2")[1]) +
-      geom_line() +
-      scale_x_date(limits = as.Date(c(input$dateslider))) +
-      labs(title = "Max, Mean, and Min Temperatures",
-           x = "",
-           y = "Temperature (in Fahrenheit)")
-
+    if(input$feature == 'temp'){
+      ggplot(data = wd, aes(x = Date, y = Mean_TemperatureF)) +
+        geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF),
+                    fill = brewer.pal(5, "Set2")[1]) +
+        geom_line() +
+        scale_x_date(limits = as.Date(c(input$dateslider))) +
+        labs(title = "Max, Mean, and Min Temperatures",
+             x = "",
+             y = "Temperature (in Fahrenheit)")
+    }
+    else if(input$feature == 'humid'){
+      # make a plot
+    }
+    else if(input$feature == 'wind.speed')
+    {
+      # make plot
+    }
+    else if(input$feature == 'precip'){
+      # make plot
+    }
     })
 }
 
