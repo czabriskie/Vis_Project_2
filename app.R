@@ -23,18 +23,23 @@ cities.states <- weather %>% select(city, state, longitude, latitude) %>% distin
 ui <- fluidPage(
   titlePanel('2018 Data Expo'),
   br(),
-  leafletOutput('map', height='600px'),
-  absolutePanel(top = 75, left = 70, textInput('target_zone', '' , 'Ex: Salt Lake City')),
-  sliderInput("dateslider",
+  sidebarLayout(
+    mainPanel(
+      leafletOutput('map', height='400px'),
+      absolutePanel(top = -10, left = 70, textInput('target_zone', '' , 'Ex: Salt Lake City'))
+      ),
+    sidebarPanel(
+      radioButtons("feature", h3("Data to Display"),
+                   c("Temperature" = "temp",
+                     "Humidity" = "humid",
+                     "Wind Speed" = "wind.speed",
+                     "Precipitation" = "precip")),
+      sliderInput("dateslider",
               label = h3("Date Range"),
               min = as.Date("2014-07-01"),
               max = as.Date("2017-09-01"),
-              value = as.Date(c("2015-01-01", "2015-06-01"))),
-  radioButtons("feature", "Data to Display",
-               c("Temperature" = "temp",
-                 "Humidity" = "humid",
-                 "Wind Speed" = "wind.speed",
-                 "Precipitation" = "precip")),
+              value = as.Date(c("2015-01-01", "2015-06-01")))
+      ), position = "left"),
   plotOutput('plot'),
   HTML('<p>Eric McKiney and Cameron Zabriskie</p>')
   )
@@ -50,8 +55,8 @@ server <- function(input, output) {
     # Get latitude and longitude
     if(input$target_zone == 'Ex: Salt Lake City'){
       ZOOM <- 3
-      LAT <- 38.075171
-      LONG <- -110.560604
+      LAT <- 47
+      LONG <- -105
     }else{
       target_pos <- geocode(input$target_zone)
       LAT <- target_pos$lat
