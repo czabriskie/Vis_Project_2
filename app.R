@@ -17,7 +17,7 @@ weather <- read.csv('weather2.csv')
 weather$Date <- as.character(weather$Date)
 weather$Date <- as.Date(weather$Date)
 
-cities.states <- weather %>% select(city, state, longitude, latitude) %>% distinct
+cities.states <- weather %>% select(city, state, longitude, latitude) %>% distinct()
 
 # Content of Page
 ui <- fluidPage(
