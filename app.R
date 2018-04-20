@@ -1,11 +1,5 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+#  used this link to figure out how buttons work
+# https://www.r-graph-gallery.com/4-tricks-for-working-with-r-leaflet-and-shiny/
 
 library(shiny)
 library(leaflet)
@@ -16,44 +10,64 @@ theme_update(plot.title = element_text(hjust = 0.5))
 
 # read in data
 # weather <- read.csv('weather2.csv')
-weather <- read.csv('weathertest.csv')
+weather <- read.csv('weather2.csv')
 
 weather$Date <- as.character(weather$Date)
 weather$Date <- as.Date(weather$Date)
 
+cities.states <- weather %>% select(city, state, longitude, latitude) %>% distinct
+cities.states <- droplevels(cities.states)
+
 # Content of Page
 ui <- fluidPage(
   titlePanel('2018 Data Expo'),
-  leafletOutput('distances'),
+  leafletOutput('map'),
   sliderInput("dateslider",
               label = h3("Date Range"),
               min = as.Date("2014-07-01"),
               max = as.Date("2017-09-01"),
               value = as.Date(c("2015-01-01", "2015-06-01"))),
-  plotOutput('hist'),
+  plotOutput('plot'),
   HTML('<p>Eric McKiney and Cameron Zabriskie</p>')
   )
 
 # Server Information
 server <- function(input, output) {
+  # create a reactive value that will store the click position
+  data_of_click <- reactiveValues(clickedMarker=NULL)
   
-  # Distance plot 
-  output$distances <- renderLeaflet({
-    leaflet(weather) %>%
-      addProviderTiles(providers$CartoDB.DarkMatter) %>%
-      
-      
-      addCircles(lng = ~longitude, 
-                 lat = ~latitude, 
-                 fillColor = 'red', 
-                 stroke = FALSE, 
-                 fillOpacity = 0.8, 
-                 opacity = 0.01
-                 )
+  # Leaflet map with cities as markers
+  output$map <- renderLeaflet({
+    leaflet() %>% 
+      # addProviderTiles(providers$CartoDB.DarkMatter) %>%
+      addTiles(options = providerTileOptions(noWrap = TRUE)) %>%
+      addCircleMarkers(data=cities.states, 
+                       ~longitude , ~latitude, 
+                       layerId=~as.character(paste(city, state, sep = ', ')), 
+                       label = ~as.character(paste(city, state, sep = ', ')), 
+                       radius=8 , color="black",  
+                       fillColor="red", 
+                       stroke = TRUE, 
+                       fillOpacity = 0.8)
   })
   
-  output$hist <- renderPlot({
-    ggplot(data = weather, aes(x = Date, y = Mean_TemperatureF)) +
+  # store the click
+  observeEvent(input$map_marker_click,{
+    data_of_click$clickedMarker <- input$map_marker_click
+  })
+  
+  # Make a plot based on selected point
+  output$plot <- renderPlot({
+    place <- data_of_click$clickedMarker$id
+    if (is.null(place)) {
+      place <- 'Salt Lake City, Utah'
+    }
+    wd <- weather %>% filter(city == gsub(',', '', regmatches(place, regexpr('.+,', place))),
+                             state == gsub(', ', '', regmatches(place, regexpr(',.+', place)))) %>% 
+      select(Mean_TemperatureF, Date, Min_TemperatureF, Max_TemperatureF)
+    
+    
+    ggplot(data = wd, aes(x = Date, y = Mean_TemperatureF)) +
       geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF),
                   fill = brewer.pal(5, "Set2")[1]) +
       geom_line() +
@@ -61,8 +75,7 @@ server <- function(input, output) {
       labs(title = "Max, Mean, and Min Temperatures",
            x = "",
            y = "Temperature (in Fahrenheit)")
-  })
+
+    })
 }
-
 shinyApp(ui = ui, server = server)
-
