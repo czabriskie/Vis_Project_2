@@ -9,16 +9,29 @@
 
 library(shiny)
 library(leaflet)
+library(ggplot2)
+library(RColorBrewer)
+
+theme_update(plot.title = element_text(hjust = 0.5))
 
 # read in data
-weather <- read.csv('weather2.csv')
+# weather <- read.csv('weather2.csv')
+weather <- read.csv('weathertest.csv')
+
+weather$Date <- as.character(weather$Date)
+weather$Date <- as.Date(weather$Date)
 
 # Content of Page
 ui <- fluidPage(
   titlePanel('2018 Data Expo'),
   leafletOutput('distances'),
+  sliderInput("dateslider",
+              label = h3("Date Range"),
+              min = as.Date("2014-07-01"),
+              max = as.Date("2017-09-01"),
+              value = as.Date(c("2015-01-01", "2015-06-01"))),
   plotOutput('hist'),
-  HTML('<p>Eric Mckiney and Cameron Zabriskie</p>')
+  HTML('<p>Eric McKiney and Cameron Zabriskie</p>')
   )
 
 # Server Information
@@ -39,12 +52,16 @@ server <- function(input, output) {
                  )
   })
   
-  # output$hist <- renderPlot({
-  #   plot(days.orders$orders, days.orders$numDays,
-  #        xlab = 'Average Orders',
-  #        ylab = 'Delivery Days',
-  #        main = 'Delivery Days vs. Average Number of Orders')
-  # })
+  output$hist <- renderPlot({
+    ggplot(data = weather, aes(x = Date, y = Mean_TemperatureF)) +
+      geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF),
+                  fill = brewer.pal(5, "Set2")[1]) +
+      geom_line() +
+      scale_x_date(limits = as.Date(c(input$dateslider))) +
+      labs(title = "Max, Mean, and Min Temperatures",
+           x = "",
+           y = "Temperature (in Fahrenheit)")
+  })
 }
 
 shinyApp(ui = ui, server = server)
