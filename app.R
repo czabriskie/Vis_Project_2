@@ -1,51 +1,62 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+#  used https://www.r-graph-gallery.com/4-tricks-for-working-with-r-leaflet-and-shiny/
 
 library(shiny)
 library(leaflet)
 
-# read in data
-weather <- read.csv('weather2.csv')
-
-# Content of Page
-ui <- fluidPage(
-  titlePanel('2018 Data Expo'),
-  leafletOutput('distances'),
-  plotOutput('hist'),
-  HTML('<p>Eric Mckiney and Cameron Zabriskie</p>')
-  )
-
-# Server Information
 server <- function(input, output) {
   
-  # Distance plot 
-  output$distances <- renderLeaflet({
-    leaflet(weather) %>%
-      addProviderTiles(providers$CartoDB.DarkMatter) %>%
-      
-      
-      addCircles(lng = ~longitude, 
-                 lat = ~latitude, 
-                 fillColor = 'red', 
-                 stroke = FALSE, 
-                 fillOpacity = 0.8, 
-                 opacity = 0.01
-                 )
+  weather <- read.csv('weather2.csv')
+  
+  weather$Date <- as.Date(weather$Date)
+  
+  cities.states <- weather %>% select(city, state, longitude, latitude) %>% distinct
+  cities.states <- droplevels(cities.states)
+
+  # create a reactive value that will store the click position
+  data_of_click <- reactiveValues(clickedMarker=NULL)
+  
+  # Leaflet map with cities as markers
+  output$map <- renderLeaflet({
+    leaflet() %>% 
+      # addProviderTiles(providers$CartoDB.DarkMatter) %>%
+      addTiles(options = providerTileOptions(noWrap = TRUE)) %>%
+      addCircleMarkers(data=cities.states, 
+                       ~longitude , ~latitude, 
+                       layerId=~as.character(paste(city, state, sep = ', ')), 
+                       label = ~as.character(paste(city, state, sep = ', ')), 
+                       radius=8 , color="black",  
+                       fillColor="red", 
+                       stroke = TRUE, 
+                       fillOpacity = 0.8)
   })
   
-  # output$hist <- renderPlot({
-  #   plot(days.orders$orders, days.orders$numDays,
-  #        xlab = 'Average Orders',
-  #        ylab = 'Delivery Days',
-  #        main = 'Delivery Days vs. Average Number of Orders')
-  # })
+  # store the click
+  observeEvent(input$map_marker_click,{
+    data_of_click$clickedMarker <- input$map_marker_click
+  })
+  
+  # Make a plot based on selected point
+  output$plot=renderPlot({
+    place <- data_of_click$clickedMarker$id
+    if (is.null(place)) {
+      place <- 'Salt Lake City, Utah'
+    }
+    wd <- weather %>% filter(city == gsub(',', '', regmatches(place, regexpr('.+,', place))),
+                             state == gsub(', ', '', regmatches(place, regexpr(',.+', place)))) %>% 
+      select(Mean_TemperatureF, Date)
+    
+    plot(wd$Date, wd$Mean_TemperatureF, type = 'l')
+  })
 }
 
-shinyApp(ui = ui, server = server)
 
+ui <- fluidPage(
+  titlePanel('2018 Data Expo'),
+
+  leafletOutput("map"),
+  plotOutput("plot"),
+
+  HTML('<p>Eric Mckiney and Cameron Zabriskie</p>')
+)
+
+shinyApp(ui = ui, server = server)
