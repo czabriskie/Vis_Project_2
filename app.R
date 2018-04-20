@@ -2,6 +2,7 @@
 # https://www.r-graph-gallery.com/4-tricks-for-working-with-r-leaflet-and-shiny/
 
 library(shiny)
+library(shinythemes)
 library(leaflet)
 library(dplyr)
 library(ggplot2)
@@ -18,24 +19,32 @@ weather <- read.csv('weather2.csv')
 weather$Date <- as.character(weather$Date)
 weather$Date <- as.Date(weather$Date)
 
-cities.states <- weather %>% select(city, state, longitude, latitude) %>% distinct
+cities.states <- weather %>% select(city, state, longitude, latitude) %>% distinct()
 
 # Content of Page
-ui <- fluidPage(
-  titlePanel('2018 Data Expo'),
+ui <- fluidPage(theme = shinytheme("superhero"),
+  titlePanel('2018 Data Expo Shiny App'),
   br(),
-  leafletOutput('map', height='600px'),
-  absolutePanel(top = 75, left = 70, textInput('target_zone', '' , 'Ex: Salt Lake City')),
-  sliderInput("dateslider",
-              label = h3("Date Range"),
-              min = as.Date("2014-07-01"),
-              max = as.Date("2017-09-01"),
-              value = as.Date(c("2015-01-01", "2015-06-01"))),
-  radioButtons("feature", "Data to Display",
-               c("Temperature" = "temp",
-                 "Humidity" = "humid",
-                 "Wind Speed" = "wind.speed",
-                 "Precipitation" = "precip")),
+  sidebarLayout(
+    mainPanel(
+      leafletOutput('map', height='400px'),
+      absolutePanel(top = -10, left = 70, textInput('target_zone', '' , 'Ex: Salt Lake City'))
+      ),
+    sidebarPanel(
+      checkboxGroupInput("feature", h3("Data to Display"),
+                         c("Temperature" = "temp",
+                           "Humidity" = "humid",
+                           "Wind Speed" = "wind.speed",
+                           "Precipitation" = "precip"),
+                         selected = "temp"),
+      br(),
+      sliderInput("dateslider",
+                  label = h3("Date Range"),
+                  min = as.Date("2014-07-01"),
+                  max = as.Date("2017-09-01"),
+                  value = as.Date(c("2015-01-01", "2015-06-01"))),
+      br()
+      ), position = "left"),
   plotOutput('plot'),
   HTML('<p>Eric McKiney and Cameron Zabriskie</p>')
   )
@@ -51,8 +60,8 @@ server <- function(input, output) {
     # Get latitude and longitude
     if(input$target_zone == 'Ex: Salt Lake City'){
       ZOOM <- 3
-      LAT <- 38.075171
-      LONG <- -110.560604
+      LAT <- 47
+      LONG <- -105
     }else{
       target_pos <- geocode(input$target_zone)
       LAT <- target_pos$lat
@@ -84,14 +93,19 @@ server <- function(input, output) {
     if (is.null(place)) {
       place <- 'Salt Lake City, Utah'
     }
-    wd <- weather %>% filter(city == gsub(',', '', regmatches(place, regexpr('.+,', place))),
-                             state == gsub(', ', '', regmatches(place, regexpr(',.+', place)))) 
+    city.data <- weather %>% filter(city == gsub(',', '', regmatches(place, regexpr('.+,', place))),
+                                    state == gsub(', ', '', regmatches(place, regexpr(',.+', place)))) 
+    state.data <- weather %>% filter( state == gsub(', ', '', regmatches(place, regexpr(',.+', place))))  %>% 
+      select(-state) %>% group_by(Date) %>% summarise_all(mean, na.rm = TRUE) %>% select(-c(city, Events, AirPtCd))
     
     if(input$feature == 'temp'){
-      ggplot(data = wd, aes(x = Date, y = Mean_TemperatureF)) +
+      ggplot(data = city.data, aes(x = Date, y = Mean_TemperatureF)) +
         geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF),
-                    fill = brewer.pal(5, "Set2")[1]) +
+                    fill = brewer.pal(5, "Set2")[1], alpha = 0.7) +
         geom_line() +
+        geom_line(data = state.data, col = 'red') +
+        geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF), data = state.data, alpha = 0.7,
+                    fill = brewer.pal(5, "Set2")[2]) +
         scale_x_date(limits = as.Date(c(input$dateslider))) +
         labs(title = "Max, Mean, and Min Temperatures",
              x = "",
