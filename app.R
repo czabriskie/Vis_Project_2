@@ -11,8 +11,7 @@ library(RColorBrewer)
 
 theme_update(plot.title = element_text(hjust = 0.5))
 
-
-# weather <- read.csv('weather2.csv')
+# read in data
 weather <- read.csv('weather2.csv')
 
 
@@ -96,30 +95,49 @@ server <- function(input, output) {
     city.data <- weather %>% filter(city == gsub(',', '', regmatches(place, regexpr('.+,', place))),
                                     state == gsub(', ', '', regmatches(place, regexpr(',.+', place)))) 
     state.data <- weather %>% filter( state == gsub(', ', '', regmatches(place, regexpr(',.+', place))))  %>% 
-      select(-state) %>% group_by(Date) %>% summarise_all(mean, na.rm = TRUE) %>% select(-c(city, Events, AirPtCd))
+      select(-state) %>% group_by(Date) %>% select(-c(city, Events, AirPtCd)) %>% summarise_all(mean, na.rm = TRUE) 
     
     if(input$feature == 'temp'){
       ggplot(data = city.data, aes(x = Date, y = Mean_TemperatureF)) +
         geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF),
                     fill = brewer.pal(5, "Set2")[1], alpha = 0.7) +
-        geom_line() +
-        geom_line(data = state.data, col = 'red') +
         geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF), data = state.data, alpha = 0.7,
                     fill = brewer.pal(5, "Set2")[2]) +
+        geom_line() +
+        geom_line(data = state.data, col = 'red') +
         scale_x_date(limits = as.Date(c(input$dateslider))) +
         labs(title = "Max, Mean, and Min Temperatures",
              x = "",
              y = "Temperature (in Fahrenheit)")
     }
     else if(input$feature == 'humid'){
-      # make a plot
+      ggplot(data = weather, aes(x = Date, y = Mean_Humidity)) +
+        geom_ribbon(aes(ymin = Min_Humidity, ymax = Max_Humidity),
+                    fill = brewer.pal(5, "Set2")[3], alpha = 0.7) +
+        geom_line() +
+        scale_x_date(limits = as.Date(c(input$dateslider))) +
+        labs(title = "Max, Mean, and Min Humidity",
+             x = "",
+             y = "Humidity (as a Percentage)")
     }
     else if(input$feature == 'wind.speed')
     {
-      # make plot
+      ggplot(data = weather, aes(x = Date, y = Mean_Wind_SpeedMPH)) +
+        geom_ribbon(aes(ymin = Min_Wind_SpeedMPH, ymax = Max_Wind_SpeedMPH),
+                    fill = brewer.pal(5, "Set2")[7], alpha = 0.7) +
+        geom_line() +
+        scale_x_date(limits = as.Date(c(input$dateslider))) +
+        labs(title = "Max, Mean, and Min Wind Speed",
+             x = "",
+             y = "Wind Speed (in MPH)")
     }
     else if(input$feature == 'precip'){
-      # make plot
+      ggplot(data = weather, aes(x = Date, y = PrecipitationIn)) +
+        geom_line() +
+        scale_x_date(limits = as.Date(c(input$dateslider))) +
+        labs(title = "Daily Precipitation",
+             x = "",
+             y = "Precipitation (in Inches)")
     }
     })
 }
