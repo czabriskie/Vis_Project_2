@@ -47,7 +47,7 @@ ui <- fluidPage(theme = shinytheme("superhero"),
       br()
       ), position = "left"),
   plotOutput('plot'),
-  HTML('<p>Eric McKiney and Cameron Zabriskie</p>')
+  HTML('<p>Eric McKinney and Cameron Zabriskie</p>')
   )
 
 # Server Information
