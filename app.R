@@ -96,10 +96,13 @@ server <- function(input, output) {
       place <- 'Salt Lake City, Utah'
     }
     city.data <- weather %>% filter(city == gsub(',', '', regmatches(place, regexpr('.+,', place))),
-                                    state == gsub(', ', '', regmatches(place, regexpr(',.+', place)))) 
-    state.data <- weather %>% filter( state == gsub(', ', '', regmatches(place, regexpr(',.+', place))))  %>% 
-      select(-state) %>% group_by(Date) %>% select(-c(city, Events, AirPtCd)) %>% summarise_all(mean, na.rm = TRUE) 
+                                    state == gsub(', ', '', regmatches(place, regexpr(',.+', place))),
+                                    Date >= as.Date(input$dateslider[[1]]) & Date <= as.Date(input$dateslider[[2]]))
     
+    state.data <- weather %>% filter( state == gsub(', ', '', regmatches(place, regexpr(',.+', place))),
+                                      Date >= as.Date(input$dateslider[[1]]) & Date <= as.Date(input$dateslider[[2]])) %>% 
+      select(-state) %>% group_by(Date) %>% select(-c(city, Events, AirPtCd)) %>% summarise_all(mean, na.rm = TRUE) 
+
     plots <- list(NULL, NULL, NULL, NULL)
     inputs <- c()
     
@@ -120,10 +123,11 @@ server <- function(input, output) {
           inputs <- c(inputs, 'temp')
       }
       if(input$feature != 'humid'  && is.null(plots[[i]]) && !('humid' %in% inputs)){
-        plots[[i]]  <- ggplot(data = weather, aes(x = Date, y = Mean_Humidity)) +
+        plots[[i]]  <- ggplot(data = city.data, aes(x = Date, y = Mean_Humidity)) +
           geom_ribbon(aes(ymin = Min_Humidity, ymax = Max_Humidity),
                       fill = brewer.pal(5, "Set2")[3], alpha = 0.7) +
           geom_line() +
+          geom_line(data = state.data, col = 'red') +
           scale_x_date(limits = as.Date(c(input$dateslider))) +
           labs(title = "Max, Mean, and Min Humidity",
                x = "",
@@ -132,8 +136,9 @@ server <- function(input, output) {
         inputs <- c(inputs, 'humid')
       }
       if(input$feature != 'wind.speed' && is.null(plots[[i]]) && !('wind.speed' %in% inputs)){
-        plots[[i]]  <- ggplot(data = weather, aes(x = Date, y = Mean_Wind_SpeedMPH)) +
+        plots[[i]]  <- ggplot(data = city.data, aes(x = Date, y = Mean_Wind_SpeedMPH)) +
           geom_line() +
+          geom_line(data = state.data, col = 'red') +
           scale_x_date(limits = as.Date(c(input$dateslider))) +
           labs(title = "Max, Mean, and Min Wind Speed",
                x = "",
@@ -142,8 +147,9 @@ server <- function(input, output) {
         inputs <- c(inputs, 'wind.speed')
       }
       if(input$feature != 'precip'  && is.null(plots[[i]]) && !('precip' %in% inputs)){
-        plots[[i]]  <- ggplot(data = weather, aes(x = Date, y = PrecipitationIn)) +
+        plots[[i]]  <- ggplot(data = city.data, aes(x = Date, y = PrecipitationIn)) +
           geom_line() +
+          geom_line(data = state.data, col = 'red') +
           scale_x_date(limits = as.Date(c(input$dateslider))) +
           labs(title = "Daily Precipitation",
                x = "",
@@ -168,30 +174,33 @@ server <- function(input, output) {
                           y = "Temperature (in Fahrenheit)")
     }
     else if(input$feature == 'humid'){
-      plots[[4]] <- ggplot(data = weather, aes(x = Date, y = Mean_Humidity)) +
+      plots[[4]] <- ggplot(data = city.data, aes(x = Date, y = Mean_Humidity)) +
                      geom_ribbon(aes(ymin = Min_Humidity, ymax = Max_Humidity),
                                  fill = brewer.pal(5, "Set2")[3], alpha = 0.7) +
                      geom_line() +
+                     geom_line(data = state.data, col = 'red') +
                      scale_x_date(limits = as.Date(c(input$dateslider))) +
                      labs(title = "Max, Mean, and Min Humidity",
                           x = "",
                           y = "Humidity (as a Percentage)")
     }
     else if(input$feature == 'wind.speed' ){
-      plots[[4]] <- ggplot(data = weather, aes(x = Date, y = Mean_Wind_SpeedMPH)) +
+      plots[[4]] <- ggplot(data = city.data, aes(x = Date, y = Mean_Wind_SpeedMPH)) +
                      geom_line() +
+                     geom_line(data = state.data, col = 'red') +
                      scale_x_date(limits = as.Date(c(input$dateslider))) +
                      labs(title = "Max, Mean, and Min Wind Speed",
                           x = "",
                           y = "Wind Speed (in MPH)")
     }
     else if(input$feature == 'precip'){
-      plots[[4]] <- ggplot(data = weather, aes(x = Date, y = PrecipitationIn)) +
-                     geom_line() +
-                     scale_x_date(limits = as.Date(c(input$dateslider))) +
-                     labs(title = "Daily Precipitation",
-                          x = "",
-                          y = "Precipitation (in Inches)")
+      plots[[4]] <- ggplot(data = city.data, aes(x = Date, y = PrecipitationIn)) +
+        geom_line() +
+        geom_line(data = state.data, col = 'red') +
+        scale_x_date(limits = as.Date(c(input$dateslider))) +
+        labs(title = "Daily Precipitation",
+             x = "",
+             y = "Precipitation (in Inches)")
     }
     
     lay <- rbind(c(4, 4, 4, 1, 2),
