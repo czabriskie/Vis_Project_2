@@ -193,7 +193,7 @@ server <- function(input, output) {
         #             fill = brewer.pal(5, 'Set2')[2]) +
         geom_line(data = state.data, aes(colour = '#998ec3'), size = 1.2) +
         geom_line(aes(colour = '#f1a340'), size = 1.2) +
-        scale_color_manual(values = c('#f1a340', '#998ec3'), labels = c('City', 'State'), name = '') +
+        scale_color_manual(values = c('#998ec3', '#f1a340'), labels = c('State', 'City'), name = '') +
         scale_y_continuous(limits = c(5 * floor(min(city.data$Mean_TemperatureF) / 5), 
                                       5 * ceiling(max(city.data$Mean_TemperatureF) / 5)),
                            labels = seq(5 * floor(min(city.data$Mean_TemperatureF) / 5), 
@@ -217,7 +217,7 @@ server <- function(input, output) {
         #             fill = brewer.pal(5, 'Set2')[3], alpha = 0.7, data = state.data) +
         geom_line(data = state.data, aes(colour = '#998ec3'), size = 1.2) +
         geom_line(aes(colour = '#f1a340'), size = 1.2) +
-        scale_color_manual(values = c('#f1a340', '#998ec3'), labels = c('City', 'State'), name = '') +
+        scale_color_manual(values = c('#998ec3', '#f1a340'), labels = c('State', 'City'), name = '') +
         scale_y_continuous(limits = c(5 * floor(min(city.data$Mean_Humidity) / 5), 
                                       5 * ceiling(max(city.data$Mean_Humidity) / 5)),
                            labels = seq(5 * floor(min(city.data$Mean_Humidity) / 5), 
@@ -237,7 +237,7 @@ server <- function(input, output) {
         plots[[4]] <- ggplot(data = city.data, aes(x = Date, y = Mean_Wind_SpeedMPH)) +
           geom_line(data = state.data, aes(colour = '#998ec3'), size = 1.2) +
           geom_line(aes(colour = '#f1a340'), size = 1.2) +
-          scale_color_manual(values = c('#f1a340', '#998ec3'), labels = c('City', 'State'), name = '') +
+          scale_color_manual(values = c('#998ec3', '#f1a340'), labels = c('State', 'City'), name = '') +
           scale_y_continuous(limits = c(5 * floor(min(city.data$Mean_Wind_SpeedMPH) / 5), 
                                         5 * ceiling(max(city.data$Mean_Wind_SpeedMPH) / 5)),
                              labels = seq(5 * floor(min(city.data$Mean_Wind_SpeedMPH) / 5), 
@@ -257,7 +257,7 @@ server <- function(input, output) {
       plots[[4]] <- ggplot(data = city.data, aes(x = Date, y = PrecipitationIn)) +
         geom_line(data = state.data, aes(colour = '#998ec3'), size = 1.2) +
         geom_line(aes(colour = '#f1a340'), size = 1.2) +
-        scale_color_manual(values = c('#f1a340', '#998ec3'), labels = c('City', 'State'), name = '') +
+        scale_color_manual(values = c('#998ec3', '#f1a340'), labels = c('State', 'City'), name = '') +
         scale_y_continuous(limits = c(floor(min(city.data$PrecipitationIn)), 
                                       ceiling(max(city.data$PrecipitationIn))),
                            labels = seq(floor(min(city.data$PrecipitationIn)), 
