@@ -24,7 +24,7 @@ weather$Date <- as.Date(weather$Date)
 cities.states <- weather %>% select(city, state, longitude, latitude) %>% distinct()
 
 # Content of Page
-ui <- fluidPage(theme = shinytheme("superhero"),
+ui <- fluidPage(theme = shinytheme('superhero'),
 
   titlePanel('2018 Data Expo Shiny App'),
   br(),
@@ -34,21 +34,21 @@ ui <- fluidPage(theme = shinytheme("superhero"),
       absolutePanel(top = -10, left = 70, textInput('target_zone', '' , 'Ex: Salt Lake City'))
       ),
     sidebarPanel(
-      radioButtons("feature", h3("Main Data Display"),
-                         c("Temperature" = "temp",
-                           "Humidity" = "humid",
-                           "Wind Speed" = "wind.speed",
-                           "Precipitation" = "precip"),
-                         selected = "temp"),
+      radioButtons('feature', h3('Main Data Display'),
+                         c('Temperature' = 'temp',
+                           'Humidity' = 'humid',
+                           'Wind Speed' = 'wind.speed',
+                           'Precipitation' = 'precip'),
+                         selected = 'temp'),
       br(),
-      sliderInput("dateslider",
-                  label = h3("Date Range"),
-                  min = as.Date("2014-07-01"),
-                  max = as.Date("2017-09-01"),
-                  value = as.Date(c("2015-01-01", "2015-06-01")),
+      sliderInput('dateslider',
+                  label = h3('Date Range'),
+                  min = as.Date('2014-07-01'),
+                  max = as.Date('2017-09-01'),
+                  value = as.Date(c('2015-01-01', '2015-06-01')),
                   step = 1),
       br()
-      ), position = "left"),
+      ), position = 'left'),
   plotOutput('plot'),
   HTML('<p>Eric McKinney and Cameron Zabriskie</p>')
   )
@@ -80,8 +80,8 @@ server <- function(input, output) {
                        ~longitude , ~latitude, 
                        layerId = ~as.character(paste(city, state, sep = ', ')), 
                        label = ~as.character(paste(city, state, sep = ', ')), 
-                       radius = 8 , color="black",  
-                       fillColor = "#f1a340", 
+                       radius = 8 , color='black',  
+                       fillColor = '#f1a340', 
                        stroke = TRUE, 
                        fillOpacity = 0.8)
   })
@@ -113,7 +113,7 @@ server <- function(input, output) {
       if (input$feature != 'temp' && is.null(plots[[i]]) && !('temp' %in% inputs)){
         plots[[i]] <- ggplot(data = city.data, aes(x = Date, y = Mean_TemperatureF)) +
           # geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF),
-          #             fill = brewer.pal(5, "Set2")[1], alpha = 0.7) +
+          #             fill = brewer.pal(5, 'Set2')[1], alpha = 0.7) +
           geom_line(colour = '#f1a340') +
           scale_y_continuous(limits = c(5 * floor(min(city.data$Mean_TemperatureF) / 5), 
                                         5 * ceiling(max(city.data$Mean_TemperatureF) / 5)),
@@ -124,15 +124,15 @@ server <- function(input, output) {
                              minor_breaks = seq(5 * floor(min(city.data$Mean_TemperatureF) / 5), 
                                                 5 * ceiling(max(city.data$Mean_TemperatureF) / 5), by = 50)) +
           theme(panel.grid.minor.x = element_blank()) +
-          labs(title = "Average Temperature",
-               x = "",
-               y = "Temperature (in Fahrenheit)")
+          labs(title = 'Average Temperature',
+               x = '',
+               y = 'Temperature (in Fahrenheit)')
         inputs <- c(inputs, 'temp')
       }
       if(input$feature != 'humid'  && is.null(plots[[i]]) && !('humid' %in% inputs)){
         plots[[i]]  <- ggplot(data = city.data, aes(x = Date, y = Mean_Humidity)) +
           # geom_ribbon(aes(ymin = Min_Humidity, ymax = Max_Humidity),
-          #             fill = brewer.pal(5, "Set2")[3], alpha = 0.7) +
+          #             fill = brewer.pal(5, 'Set2')[3], alpha = 0.7) +
           geom_line(colour = '#f1a340') +
           scale_y_continuous(limits = c(5 * floor(min(city.data$Mean_Humidity) / 5), 
                                         5 * ceiling(max(city.data$Mean_Humidity) / 5)),
@@ -143,9 +143,9 @@ server <- function(input, output) {
                              minor_breaks = seq(5 * floor(min(city.data$Mean_Humidity) / 5), 
                                                 5 * ceiling(max(city.data$Mean_Humidity) / 5), by = 50)) +
           theme(panel.grid.minor.x = element_blank()) +
-          labs(title = "Average Humidity",
-               x = "",
-               y = "Humidity (as a Percentage)")
+          labs(title = 'Average Humidity',
+               x = '',
+               y = 'Humidity (as a Percentage)')
         inputs <- c(inputs, 'humid')
       }
       if(input$feature != 'wind.speed' && is.null(plots[[i]]) && !('wind.speed' %in% inputs)){
@@ -160,9 +160,9 @@ server <- function(input, output) {
                              minor_breaks = seq(5 * floor(min(city.data$Mean_Wind_SpeedMPH) / 5), 
                                                 5 * ceiling(max(city.data$Mean_Wind_SpeedMPH) / 5), by = 50)) +
           theme(panel.grid.minor.x = element_blank()) +
-          labs(title = "Wind Speed",
-               x = "",
-               y = "Wind Speed (in MPH)")
+          labs(title = 'Wind Speed',
+               x = '',
+               y = 'Wind Speed (in MPH)')
         inputs <- c(inputs, 'wind.speed')
       }
       if(input$feature != 'precip'  && is.null(plots[[i]]) && !('precip' %in% inputs)){
@@ -177,9 +177,9 @@ server <- function(input, output) {
                              minor_breaks = seq(floor(min(city.data$PrecipitationIn)), 
                                                 ceiling(max(city.data$PrecipitationIn)), by = 0.5)) +
           theme(panel.grid.minor.x = element_blank()) +
-          labs(title = "Daily Precipitation",
-               x = "",
-               y = "Precipitation (in Inches)") 
+          labs(title = 'Daily Precipitation',
+               x = '',
+               y = 'Precipitation (in Inches)') 
         inputs <- c(inputs, 'precip')
       }
       
@@ -188,9 +188,9 @@ server <- function(input, output) {
     if (input$feature == 'temp'){
       plots[[4]] <- ggplot(data = city.data, aes(x = Date, y = Mean_TemperatureF)) +
         # geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF),
-        #             fill = brewer.pal(5, "Set2")[1], alpha = 0.7) +
+        #             fill = brewer.pal(5, 'Set2')[1], alpha = 0.7) +
         # geom_ribbon(aes(ymin = Min_TemperatureF, ymax = Max_TemperatureF), data = state.data, alpha = 0.7,
-        #             fill = brewer.pal(5, "Set2")[2]) +
+        #             fill = brewer.pal(5, 'Set2')[2]) +
         geom_line(aes(colour = '#f1a340'), size = 1.2) +
         geom_line(data = state.data, aes(colour = '#998ec3'), size = 1.2) +
         scale_color_manual(values = c('#f1a340', '#998ec3'), labels = c('City', 'State'), name = '') +
@@ -203,18 +203,18 @@ server <- function(input, output) {
                            minor_breaks = seq(5 * floor(min(city.data$Mean_TemperatureF) / 5), 
                                               5 * ceiling(max(city.data$Mean_TemperatureF) / 5), by = 50)) +
         theme(panel.grid.minor.x = element_blank()) +
-        labs(title = "Average Temperature",
-             x = "",
-             y = "Temperature (in Fahrenheit)") +
+        labs(title = 'Average Temperature',
+             x = '',
+             y = 'Temperature (in Fahrenheit)') +
         theme(axis.title.y = element_text(size = 15), axis.text = element_text(size = 15), 
               plot.title = element_text(size = 20), legend.text = element_text(size = 15))
     }
     else if(input$feature == 'humid'){
       plots[[4]] <- ggplot(data = city.data, aes(x = Date, y = Mean_Humidity)) +
         # geom_ribbon(aes(ymin = Min_Humidity, ymax = Max_Humidity),
-        #             fill = brewer.pal(5, "Set2")[2], alpha = 0.7) +
+        #             fill = brewer.pal(5, 'Set2')[2], alpha = 0.7) +
         # geom_ribbon(aes(ymin = Min_Humidity, ymax = Max_Humidity),
-        #             fill = brewer.pal(5, "Set2")[3], alpha = 0.7, data = state.data) +
+        #             fill = brewer.pal(5, 'Set2')[3], alpha = 0.7, data = state.data) +
         geom_line(aes(colour = '#f1a340'), size = 1.2) +
         geom_line(data = state.data, aes(colour = '#998ec3'), size = 1.2) +
         scale_color_manual(values = c('#f1a340', '#998ec3'), labels = c('City', 'State'), name = '') +
@@ -227,9 +227,9 @@ server <- function(input, output) {
                            minor_breaks = seq(5 * floor(min(city.data$Mean_Humidity) / 5), 
                                               5 * ceiling(max(city.data$Mean_Humidity) / 5), by = 50)) +
         theme(panel.grid.minor.x = element_blank()) +
-        labs(title = "Average Humidity",
-             x = "",
-             y = "Humidity (as a Percentage)") +
+        labs(title = 'Average Humidity',
+             x = '',
+             y = 'Humidity (as a Percentage)') +
         theme(axis.title.y = element_text(size = 15), axis.text = element_text(size = 15), 
               plot.title = element_text(size = 20), legend.text = element_text(size = 15))
     }
@@ -247,9 +247,9 @@ server <- function(input, output) {
                              minor_breaks = seq(5 * floor(min(city.data$Mean_Wind_SpeedMPH) / 5), 
                                                 5 * ceiling(max(city.data$Mean_Wind_SpeedMPH) / 5), by = 50)) +
           theme(panel.grid.minor.x = element_blank()) +
-          labs(title = "Wind Speed",
-               x = "",
-               y = "Wind Speed (in MPH)") +
+          labs(title = 'Wind Speed',
+               x = '',
+               y = 'Wind Speed (in MPH)') +
           theme(axis.title.y = element_text(size = 15), axis.text = element_text(size = 15), 
                 plot.title = element_text(size = 20), legend.text = element_text(size = 15))
     }
@@ -267,9 +267,9 @@ server <- function(input, output) {
                            minor_breaks = seq(floor(min(city.data$PrecipitationIn)), 
                                               ceiling(max(city.data$PrecipitationIn)), by = 0.5)) +
         theme(panel.grid.minor.x = element_blank()) +
-        labs(title = "Daily Precipitation",
-             x = "",
-             y = "Precipitation (in Inches)") +
+        labs(title = 'Daily Precipitation',
+             x = '',
+             y = 'Precipitation (in Inches)') +
         theme(axis.title.y = element_text(size = 15), axis.text = element_text(size = 15), 
               plot.title = element_text(size = 20), legend.text = element_text(size = 15))
     }
