@@ -80,7 +80,7 @@ server <- function(input, output) {
                        layerId = ~as.character(paste(city, state, sep = ', ')), 
                        label = ~as.character(paste(city, state, sep = ', ')), 
                        radius = 8 , color="black",  
-                       fillColor = "#b35806", 
+                       fillColor = "#f1a340", 
                        stroke = TRUE, 
                        fillOpacity = 0.8)
   })
