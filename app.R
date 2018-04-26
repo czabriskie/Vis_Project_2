@@ -30,7 +30,7 @@ ui <- fluidPage(theme = shinytheme('superhero'),
   br(),
   sidebarLayout(
     mainPanel(
-      leafletOutput('map', height='400px'),
+      leafletOutput('map', height='410px'),
       absolutePanel(top = -10, left = 70, textInput('target_zone', '' , 'Ex: Salt Lake City'))
       ),
     sidebarPanel(
