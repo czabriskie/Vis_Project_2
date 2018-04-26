@@ -122,6 +122,7 @@ server <- function(input, output) {
                                           5 * ceiling(max(city.data$Mean_TemperatureF) / 5), by = 20),
                              minor_breaks = seq(5 * floor(min(city.data$Mean_TemperatureF) / 5), 
                                                 5 * ceiling(max(city.data$Mean_TemperatureF) / 5), by = 50)) +
+          theme(panel.grid.minor.x = element_blank()) +
           labs(title = "Average Temperature",
                x = "",
                y = "Temperature (in Fahrenheit)")
@@ -140,6 +141,7 @@ server <- function(input, output) {
                                           5 * ceiling(max(city.data$Mean_Humidity) / 5), by = 20),
                              minor_breaks = seq(5 * floor(min(city.data$Mean_Humidity) / 5), 
                                                 5 * ceiling(max(city.data$Mean_Humidity) / 5), by = 50)) +
+          theme(panel.grid.minor.x = element_blank()) +
           labs(title = "Average Humidity",
                x = "",
                y = "Humidity (as a Percentage)")
@@ -156,6 +158,7 @@ server <- function(input, output) {
                                           5 * ceiling(max(city.data$Mean_Wind_SpeedMPH) / 5), by = 5),
                              minor_breaks = seq(5 * floor(min(city.data$Mean_Wind_SpeedMPH) / 5), 
                                                 5 * ceiling(max(city.data$Mean_Wind_SpeedMPH) / 5), by = 50)) +
+          theme(panel.grid.minor.x = element_blank()) +
           labs(title = "Wind Speed",
                x = "",
                y = "Wind Speed (in MPH)")
@@ -172,6 +175,7 @@ server <- function(input, output) {
                                           ceiling(max(city.data$PrecipitationIn)), by = 0.5),
                              minor_breaks = seq(floor(min(city.data$PrecipitationIn)), 
                                                 ceiling(max(city.data$PrecipitationIn)), by = 0.5)) +
+          theme(panel.grid.minor.x = element_blank()) +
           labs(title = "Daily Precipitation",
                x = "",
                y = "Precipitation (in Inches)") 
@@ -197,6 +201,7 @@ server <- function(input, output) {
                                         5 * ceiling(max(city.data$Mean_TemperatureF) / 5), by = 5),
                            minor_breaks = seq(5 * floor(min(city.data$Mean_TemperatureF) / 5), 
                                               5 * ceiling(max(city.data$Mean_TemperatureF) / 5), by = 50)) +
+        theme(panel.grid.minor.x = element_blank()) +
         labs(title = "Average Temperature",
              x = "",
              y = "Temperature (in Fahrenheit)") +
@@ -220,6 +225,7 @@ server <- function(input, output) {
                                         5 * ceiling(max(city.data$Mean_Humidity) / 5), by = 5),
                            minor_breaks = seq(5 * floor(min(city.data$Mean_Humidity) / 5), 
                                               5 * ceiling(max(city.data$Mean_Humidity) / 5), by = 50)) +
+        theme(panel.grid.minor.x = element_blank()) +
         labs(title = "Average Humidity",
              x = "",
              y = "Humidity (as a Percentage)") +
@@ -239,6 +245,7 @@ server <- function(input, output) {
                                           5 * ceiling(max(city.data$Mean_Wind_SpeedMPH) / 5), by = 5),
                              minor_breaks = seq(5 * floor(min(city.data$Mean_Wind_SpeedMPH) / 5), 
                                                 5 * ceiling(max(city.data$Mean_Wind_SpeedMPH) / 5), by = 50)) +
+          theme(panel.grid.minor.x = element_blank()) +
           labs(title = "Wind Speed",
                x = "",
                y = "Wind Speed (in MPH)") +
@@ -258,6 +265,7 @@ server <- function(input, output) {
                                         ceiling(max(city.data$PrecipitationIn)), by = 0.5),
                            minor_breaks = seq(floor(min(city.data$PrecipitationIn)), 
                                               ceiling(max(city.data$PrecipitationIn)), by = 0.5)) +
+        theme(panel.grid.minor.x = element_blank()) +
         labs(title = "Daily Precipitation",
              x = "",
              y = "Precipitation (in Inches)") +
