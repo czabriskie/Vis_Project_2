@@ -34,7 +34,7 @@ ui <- fluidPage(theme = shinytheme("superhero"),
       absolutePanel(top = -10, left = 70, textInput('target_zone', '' , 'Ex: Salt Lake City'))
       ),
     sidebarPanel(
-      radioButtons("feature", h3("Data to Display"),
+      radioButtons("feature", h3("Main Data Display"),
                          c("Temperature" = "temp",
                            "Humidity" = "humid",
                            "Wind Speed" = "wind.speed",
